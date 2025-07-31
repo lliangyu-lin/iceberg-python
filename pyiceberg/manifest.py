@@ -1138,7 +1138,7 @@ class ManifestWriterV1(ManifestWriter):
 
     def prepare_entry(self, entry: ManifestEntry) -> ManifestEntry:
         if entry.status != ManifestEntryStatus.EXISTING and entry.snapshot_id != self._snapshot_id:
-            raise ValueError(f'mismatched snapshot id for entry: {entry.snapshot_id} vs {self._snapshot_id}')
+            raise ValueError(f"mismatched snapshot id for entry: {entry.snapshot_id} vs {self._snapshot_id}")
         return entry
 
 
@@ -1174,7 +1174,7 @@ class ManifestWriterV2(ManifestWriter):
             if entry.status != ManifestEntryStatus.ADDED:
                 raise ValueError("Only entries with status ADDED can have null sequence number")
         if entry.status != ManifestEntryStatus.EXISTING and entry.snapshot_id != self._snapshot_id:
-            raise ValueError(f'mismatched snapshot id for entry: {entry.snapshot_id} vs {self._snapshot_id}')
+            raise ValueError(f"mismatched snapshot id for entry: {entry.snapshot_id} vs {self._snapshot_id}")
         return entry
 
 
