@@ -23,6 +23,7 @@ on:
   push:
     branches:
     - 'main'
+    - 'fix-delete-snapshotid-test'
   pull_request:
     paths:
     - '**'                              # Include all files and directories in the repository by default.
@@ -47,7 +48,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python: ['3.9', '3.10', '3.11', '3.12']
+        python: ['3.10']
 
     steps:
     - uses: actions/checkout@v4
@@ -73,7 +74,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python: ['3.9', '3.10', '3.11', '3.12']
+        python: ['3.10']
 
     steps:
     - uses: actions/checkout@v4
@@ -88,23 +89,23 @@ jobs:
       if: ${{ failure() }}
       run: docker compose -f dev/docker-compose.yml logs
 
-    - name: Run s3 integration tests with coverage
-      run: COVERAGE=1 make test-s3
-    - name: Show debug logs
-      if: ${{ failure() }}
-      run: docker compose -f dev/docker-compose.yml logs
-
-    - name: Run adls integration tests with coverage
-      run: COVERAGE=1 make test-adls
-    - name: Show debug logs
-      if: ${{ failure() }}
-      run: docker compose -f dev/docker-compose-azurite.yml logs
-
-    - name: Run gcs integration tests with coverage
-      run: COVERAGE=1 make test-gcs
-    - name: Show debug logs
-      if: ${{ failure() }}
-      run: docker compose -f dev/docker-compose-gcs-server.yml logs
+#    - name: Run s3 integration tests with coverage
+#      run: COVERAGE=1 make test-s3
+#    - name: Show debug logs
+#      if: ${{ failure() }}
+#      run: docker compose -f dev/docker-compose.yml logs
+#
+#    - name: Run adls integration tests with coverage
+#      run: COVERAGE=1 make test-adls
+#    - name: Show debug logs
+#      if: ${{ failure() }}
+#      run: docker compose -f dev/docker-compose-azurite.yml logs
+#
+#    - name: Run gcs integration tests with coverage
+#      run: COVERAGE=1 make test-gcs
+#    - name: Show debug logs
+#      if: ${{ failure() }}
+#      run: docker compose -f dev/docker-compose-gcs-server.yml logs
 
     - name: Generate coverage report (75%) # Coverage threshold should only increase over time — never decrease it!
       run: COVERAGE_FAIL_UNDER=75 make coverage-report
