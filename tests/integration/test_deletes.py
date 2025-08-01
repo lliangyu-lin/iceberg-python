@@ -943,8 +943,11 @@ def test_time_travel_after_delete(spark: SparkSession, session_catalog: RestCata
             TBLPROPERTIES('format-version' = {format_version})
         """,
             f"""
-            INSERT INTO {identifier} VALUES (1, 'foo'), (2, 'bar')
+            INSERT INTO {identifier} VALUES (1, 'foo')
         """,
+            f"""
+                INSERT INTO {identifier} VALUES (2, 'bar')
+            """
             f"""
             INSERT INTO {identifier} VALUES (3, 'baz'), (4, 'qux')
         """,
