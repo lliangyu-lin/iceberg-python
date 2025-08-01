@@ -927,7 +927,7 @@ def test_delete_on_empty_table(spark: SparkSession, session_catalog: RestCatalog
 
 @pytest.mark.integration
 @pytest.mark.parametrize("format_version", [1, 2])
-def test_time_travel_after_delete(spark: SparkSession, session_catalog: RestCatalog, format_version: int):
+def test_time_travel_after_delete(spark: SparkSession, session_catalog: RestCatalog, format_version: int) -> None:
     identifier = "default.table_delete_time_travel"
 
     run_spark_commands(
@@ -947,8 +947,8 @@ def test_time_travel_after_delete(spark: SparkSession, session_catalog: RestCata
         """,
             f"""
             INSERT INTO {identifier} VALUES (3, 'baz'), (4, 'qux')
-        """
-        ]
+        """,
+        ],
     )
 
     tbl = session_catalog.load_table(identifier)
