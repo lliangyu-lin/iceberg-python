@@ -923,3 +923,51 @@ def test_delete_on_empty_table(spark: SparkSession, session_catalog: RestCatalog
 
     # Assert that no new snapshot was created because no rows were deleted
     assert len(tbl.snapshots()) == 0
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("format_version", [1, 2])
+def test_time_travel_after_delete(spark: SparkSession, session_catalog: RestCatalog, format_version: int):
+    identifier = "default.table_delete_time_travel"
+
+    run_spark_commands(
+        spark,
+        [
+            f"DROP TABLE IF EXISTS {identifier}",
+            f"""
+            CREATE TABLE {identifier} (
+                id  int,
+                name string
+            )
+            USING iceberg
+            TBLPROPERTIES('format-version' = {format_version})
+        """,
+            f"""
+            INSERT INTO {identifier} VALUES (1, 'foo'), (2, 'bar')
+        """,
+            f"""
+            INSERT INTO {identifier} VALUES (3, 'baz'), (4, 'qux')
+        """
+        ]
+    )
+
+    tbl = session_catalog.load_table(identifier)
+    before_delete_snapshot_id = tbl.current_snapshot()
+
+    tbl.delete(EqualTo("idx", 2))
+
+    # Confirm current snapshot does NOT contain deleted row
+    current_data = tbl.scan().to_arrow().to_pylist()
+    assert current_data == [
+        {"idx": 1, "value": "foo"},
+        {"idx": 3, "value": "baz"},
+        {"idx": 4, "value": "qux"},
+    ]
+
+    data_before_delete = tbl.scan(snapshot_id=before_delete_snapshot_id).to_arrow().to_pylist()
+    assert data_before_delete == [
+        {"idx": 1, "value": "foo"},
+        {"idx": 2, "value": "bar"},
+        {"idx": 3, "value": "baz"},
+        {"idx": 4, "value": "qux"},
+    ]
