@@ -952,22 +952,22 @@ def test_time_travel_after_delete(spark: SparkSession, session_catalog: RestCata
     )
 
     tbl = session_catalog.load_table(identifier)
-    before_delete_snapshot_id = tbl.current_snapshot()
+    before_delete_snapshot_id = tbl.current_snapshot().snapshot_id
 
-    tbl.delete(EqualTo("idx", 2))
+    tbl.delete(EqualTo("id", 2))
 
     # Confirm current snapshot does NOT contain deleted row
     current_data = tbl.scan().to_arrow().to_pylist()
     assert current_data == [
-        {"idx": 1, "value": "foo"},
-        {"idx": 3, "value": "baz"},
-        {"idx": 4, "value": "qux"},
+        {"id": 1, "value": "foo"},
+        {"id": 3, "value": "baz"},
+        {"id": 4, "value": "qux"},
     ]
 
     data_before_delete = tbl.scan(snapshot_id=before_delete_snapshot_id).to_arrow().to_pylist()
     assert data_before_delete == [
-        {"idx": 1, "value": "foo"},
-        {"idx": 2, "value": "bar"},
-        {"idx": 3, "value": "baz"},
-        {"idx": 4, "value": "qux"},
+        {"id": 1, "value": "foo"},
+        {"id": 2, "value": "bar"},
+        {"id": 3, "value": "baz"},
+        {"id": 4, "value": "qux"},
     ]
